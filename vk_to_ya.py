@@ -69,11 +69,12 @@ class IoJson:
 class VK:
 
     def __init__(self, file_token='tokens/token_vk.txt', user_id='207289490', version='5.131',
-                 base_url='https://api.vk.com/method/'):
+                 base_url='https://api.vk.com/method/', quantity_photo=5):
         self.file_token = file_token
         self.user_id = user_id
         self.version = version
         self.base_url = base_url
+        self.quantity_photo = quantity_photo
 
     def gettoken(self):
         with open(self.file_token, 'r') as file_object:
@@ -100,7 +101,7 @@ class VK:
         return requests.get(f'{self.base_url}photos.get', params={**params, **self.general_params()}).json()
 
     def max_find_photo(self, album_photos):
-        '''возвращает тип и url картинки с максимальным размером'''
+        '''get type and url photo max size'''
         height_width_size_max = 0
         for i in album_photos:
             if height_width_size_max < i['height'] * i['width']:
