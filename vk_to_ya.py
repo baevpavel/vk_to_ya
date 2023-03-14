@@ -4,9 +4,9 @@ import json
 import datetime
 import time
 from tqdm import tqdm
+from operator import itemgetter
 
 class YandexDisk:
-
 
     def __init__(self, file_token='tokens/token_ya.txt'):
         # self.access_token = access_token
@@ -110,34 +110,53 @@ class VK:
                 url_size_max = i['url']
         return [type_size_max, url_size_max]
 
-    def get_list_photos_and_inf(self):
+    def get_list_photos_and_inf(self, photo_wall_inf):
+        parser_data = []
+        for album in photo_wall_inf['response']['items']:
+            likes = album['likes']['count']
+            url = vk.max_find_photo(album['sizes'])[1]
+            size_type = vk.max_find_photo(album['sizes'])[0]
+            date = datetime.datetime.fromtimestamp(album['date']).strftime('%Y%m%d_%H%M')
+            file_name = f'{likes}_{date}.jpg'
+            dict = {'file_name': file_name, 'size_type': size_type, 'url': url}
+            parser_data.append(dict)
+            parser_data_sorted = sorted(parser_data, key=itemgetter('file_name'), reverse=True)
+        return parser_data_sorted
+
+    def load_photo(self):
         pass
         return ''
 
     # def create_name_file
-vk = VK()
-a = vk.photos_get()
-count_photos = a['response']['count']
-bar0 = 100/count_photos
-bar1 = 0
+# vk = VK()
+# photo_wall_inf = vk.photos_get()
+# count_photos = photo_wall_inf['response']['count']
+# bar0 = 100/count_photos
+# bar1 = 0
 
-for album in a['response']['items']:
-    a = (str(album['likes']['count'])+'_'+
-         str(datetime.datetime.fromtimestamp(album['date']).strftime('%Y%m%d_%H%M'))+'.jpg',
-         vk.max_find_photo(album['sizes'])[0],vk.max_find_photo(album['sizes'])[1])
-    b = f"{a[0][0]}.jpg {a[0]} {a[1]} {a[2]}"
-    name_file = f'Upload/{a[0][0]}.jpg'
-    url_file = f'{a[2]}'
+# for album in photo_wall_inf['response']['items']:
+#     a = (str(album['likes']['count'])+'_'+
+#          str(datetime.datetime.fromtimestamp(album['date']).strftime('%Y%m%d_%H%M'))+'.jpg',
+#          vk.max_find_photo(album['sizes'])[0], vk.max_find_photo(album['sizes'])[1])
+#     b = f"{a[0][0]}.jpg {a[0]} {a[1]} {a[2]}"
+#     name_file = f'Upload/{b.split(" ")[1]}'
+#     url_file = f'{a[2]}'
     # filename = 'photo.jpg'
-    foto_download = requests.get(url_file)
-    with open(name_file, 'wb') as file:
-        file.write(foto_download.content)
-    bar1 += bar0
-    print("*" * int(bar0), end='')
-print(f'\nЗагружено {count_photos} файлов')
+    # photo_download = requests.get(url_file)
+    # with open(name_file, 'wb') as file:
+    #     file.write(photo_download.content)
+    # bar1 += bar0
+    # print("*" * int(bar0), end='')
+    # print(f'\nЗагружено {count_photos} файлов')
+# if __name__ == '__main__':
+vk = VK()
+photo_wall_inf = vk.photos_get()
+count_photos = photo_wall_inf['response']['count']
+bar0 = 100 / count_photos
+bar1 = 0
+pprint(vk.get_list_photos_and_inf(photo_wall_inf))
+
 pass
-
-
 
     # ya = YandexDisk()
     # path_to_disk = f'Download/{name_file}'
